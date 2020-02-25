@@ -135,7 +135,6 @@ export default function App() {
     startGameHandler,
     handleSizeChanged,
     size,
-    styles.sizeSliderContainer,
     gameStateString
   ]);
 
