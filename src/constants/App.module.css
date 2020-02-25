@@ -1,0 +1,34 @@
+.container {
+  height: 100%;
+  width: 100%;
+  padding: 1em;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.actionContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.sizeSliderContainer {
+  width: 5em;
+  margin-left: 1em;
+}
+
+.card {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.positionButton {
+  height: 100%;
+}
+
+.positionContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -15,54 +15,22 @@ import {
 
 import { Close, RadioButtonUnchecked, Cancel } from "@material-ui/icons";
 
-import TicTacToe from "./Tic-Tac-Toe";
+import TicTacToe, { listeners } from "./Tic-Tac-Toe";
+import strings from "./constants/strings.json";
+import styles from "./constants/App.module.css";
 
 export default function App() {
   const [size, setSize] = useState(3);
-  const handleSizeChanged = useCallback((event, value) => {
+  const handleSizeChanged = useCallback((_, value) => {
     setSize(value);
   }, []);
 
-  const styles = useMemo(
-    () => ({
-      container: css`
-        height: 100%;
-        width: 100%;
-        padding: 1em;
-        box-sizing: border-box;
-        position: relative;
-      `,
-      actionContainer: css`
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-      `,
-      sizeSliderContainer: css`
-        width: 5em;
-        margin-left: 1em;
-      `,
-      card: css`
-        height: 100%;
-        display: grid;
-        grid-template-rows: auto 1fr;
-      `,
-      board: css`
-        display: grid;
-        grid-template-columns: repeat(${size}, 1fr);
-        grid-template-rows: repeat(${size}, 1fr);
-        grid-gap: 0.5em;
-      `,
-      positionButton: css`
-        height: 100%;
-      `,
-      positionContainer: css`
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      `
-    }),
-    [size]
-  );
+  const boardStyle = useMemo(() => css`
+    display: grid;
+    grid-template-columns: repeat(${size}, 1fr);
+    grid-template-rows: repeat(${size}, 1fr);
+    grid-gap: 0.5em;
+  `, [size]);
 
   const [game, setGame] = useState(null);
   const [board, setBoard] = useState([]);
@@ -80,7 +48,7 @@ export default function App() {
 
   const onGameEnded = useCallback((gameEnded, winner, mark) => {
     if (gameEnded) {
-      console.log({ gameEnded, winner, mark });
+      // console.log({ gameEnded, winner, mark });
       setGame(null);
       if (winner !== null) {
         setPlayer(winner);
@@ -101,15 +69,16 @@ export default function App() {
     setGame(newGame);
 
     const unregisterBoard = newGame.addListener(
-      "onBoardChanged",
+      listeners.onBoardChanged,
       onBoardChanged
     );
+
     const unregisterPlayer = newGame.addListener(
-      "onPlayerChanged",
+      listeners.onPlayerChanged,
       onPlayerChanged
     );
 
-    const unregisterGameEnded = newGame.addListener("onGameEnded", onGameEnded);
+    const unregisterGameEnded = newGame.addListener(listeners.onGameEnded, onGameEnded);
 
     return () => {
       setGame(null);
@@ -124,14 +93,21 @@ export default function App() {
     };
   }, [size, onBoardChanged, onPlayerChanged, onGameEnded]);
 
-  const title = useMemo(() => "Tic Tac Toe", []);
-
-  const gameState = useMemo(() => {
+  const gameStateString = useMemo(() => {
     if (game === null && player === null) return null;
-    else if (game === null && player === false) return `Draw!`;
-    else if (game === null && player !== null) return "Winner!";
-    else return "Turn";
+    else if (game === null && player === false) return strings.states.draw;
+    else if (game === null && player !== null) return strings.states.win;
+    else return strings.states.turn;
   }, [game, player]);
+
+  const gameState = useMemo(() => gameStateString === null ? null : (
+    <>
+      <Typography variant="caption">{gameStateString}</Typography>
+      <div>
+        {gameStateString === strings.states.draw ? <Cancel color="disabled" /> : mark}
+      </div>
+    </>
+  ), [gameStateString, mark]);
 
   const action = useMemo(() => {
     if (game === null)
@@ -149,7 +125,7 @@ export default function App() {
             />
           </div>
           <Button variant="outlined" onClick={startGameHandler}>
-            {gameState === null ? "Play!" : "Play Again!"}
+            {gameStateString === null ? strings.button.start : strings.button.restart}
           </Button>
         </>
       );
@@ -159,26 +135,20 @@ export default function App() {
     startGameHandler,
     handleSizeChanged,
     size,
-    styles.sizeSliderContainer
+    styles.sizeSliderContainer,
+    gameStateString
   ]);
 
   return (
     <div className={styles.container}>
       <Card className={styles.card}>
         <CardHeader
+          title={strings.title}
+          action={gameState}
           component={Paper}
-          title={title}
           square
-          action={
-            <>
-              <Typography variant="caption">{gameState}</Typography>
-              <div>
-                {gameState === "Draw!" ? <Cancel color="disabled" /> : mark}
-              </div>
-            </>
-          }
         />
-        <CardContent className={styles.board}>
+        <CardContent className={boardStyle}>
           {board.map((s, p) => {
             return (
               <Card key={p}>

@@ -1,0 +1,15 @@
+{
+  "listener": {
+    "eventType": "Event must be a string.",
+    "callbackType": "Callback must be a function."
+  },
+  "position": {
+    "ended": "Game has already ended.",
+    "played": "Position has already been played."
+  },
+  "validator": {
+    "index": "Index is out of board range.",
+    "row": "Row is out of board range.",
+    "col": "Column is out of board range."
+  }
+}

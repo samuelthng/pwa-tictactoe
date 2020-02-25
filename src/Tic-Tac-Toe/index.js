@@ -1,3 +1,8 @@
+import errors from "./errors.json";
+
+import listeners from "./listeners";
+export { listeners };
+
 class TicTacToe {
   /** Rows of the board. */
   _rows;
@@ -136,11 +141,11 @@ class TicTacToe {
     this.checkValidIndex(index);
 
     if (this._gameEnded) {
-      throw Error("Game has already ended.");
+      throw Error(errors.position.ended);
     }
 
     if (this._board[index] !== null) {
-      throw Error("Position has already been played.");
+      throw Error(errors.position.played);
     }
 
     this._moves++;
@@ -152,18 +157,18 @@ class TicTacToe {
       this._winner = this.currentPlayer;
       this._gameEnded = true;
       this.updateGameEndedListeners();
-      console.log(
-        `Game has ended, the winner: Player ${this.currentPlayer}, "${
-          this._playerMap[this.currentPlayer]
-        }"`
-      );
+      // console.log(
+      //   `Game has ended, the winner: Player ${this.currentPlayer}, "${
+      //     this._playerMap[this.currentPlayer]
+      //   }"`
+      // );
     } else if (this._moves === this._size * this._size) {
       this._gameEnded = true;
       this.updateGameEndedListeners();
-      console.log(`Game has ended with a draw!`);
+      // console.log(`Game has ended with a draw!`);
     } else {
       this.togglePlayer();
-      console.log(`It is player: ${this._currentPlayer}'s turn.`);
+      // console.log(`It is player: ${this._currentPlayer}'s turn.`);
     }
   }
 
@@ -218,26 +223,26 @@ class TicTacToe {
    * @returns { function } Removes a callback function.
    */
   addListener(event, callback) {
-    if (typeof event !== "string") throw TypeError("Event must be a string.");
+    if (typeof event !== "symbol") throw TypeError(errors.listener.eventType);
     if (typeof callback !== "function")
-      throw TypeError("Callback must be a function.");
+      throw TypeError(errors.listener.callbackType);
 
     switch (event) {
-      case "onBoardChanged":
+      case listeners.onBoardChanged:
         this.onBoardChanged.push(callback);
         this.updateBoardListeners(callback);
         return () => {
           const index = this.onBoardChanged.findIndex(callback);
           this.onBoardChanged.splice(index, 1);
         };
-      case "onPlayerChanged":
+      case listeners.onPlayerChanged:
         this.onPlayerChanged.push(callback);
         this.updatePlayerListeners(callback);
         return () => {
           const index = this.onPlayerChanged.findIndex(callback);
           this.onPlayerChanged.splice(index, 1);
         };
-      case "onGameEnded":
+      case listeners.onGameEnded:
         this.onGameEnded.push(callback);
         this.updateGameEndedListeners(callback);
         return () => {
@@ -255,7 +260,7 @@ class TicTacToe {
    **/
   checkValidIndex(index) {
     if (index > this._board.length || index < 0) {
-      throw RangeError("Index is out of board range.");
+      throw RangeError(errors.validator.index);
     }
   }
 
@@ -265,7 +270,7 @@ class TicTacToe {
    **/
   checkValidRow(row) {
     if (row < 0 || row > this._rows) {
-      throw RangeError("Row is out of board range.");
+      throw RangeError(errors.validator.row);
     }
   }
 
@@ -275,7 +280,7 @@ class TicTacToe {
    **/
   checkValidCol(col) {
     if (col < 0 || col > this._cols) {
-      throw RangeError("Column is out of board range.");
+      throw RangeError(errors.validator.col);
     }
   }
 
@@ -306,22 +311,6 @@ class TicTacToe {
   getColOf(index) {
     this.checkValidIndex(index);
     return index % this._size;
-  }
-
-  /** Board utilities. */
-  get utilities() {
-    return {
-      validators: {
-        checkValidIndex: this.checkValidIndex.bind(this),
-        checkValidRow: this.checkValidRow.bind(this),
-        checkValidCol: this.checkValidCol.bind(this)
-      },
-      getters: {
-        getIndexOf: this.getIndexOf.bind(this),
-        getRowOf: this.getRowOf.bind(this),
-        getColOf: this.getColOf.bind(this)
-      }
-    };
   }
 }
 
