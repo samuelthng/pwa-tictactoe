@@ -116,6 +116,7 @@ class TicTacToe {
       this.getIndexOf(this.flipRow(i), i)
     );
   }
+
   checkRowWin(row) {
     return this.checkWinningIndexes(this.getRowIndexes(row));
   }

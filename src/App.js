@@ -48,7 +48,6 @@ export default function App() {
 
   const onGameEnded = useCallback((gameEnded, winner, mark) => {
     if (gameEnded) {
-      // console.log({ gameEnded, winner, mark });
       setGame(null);
       if (winner !== null) {
         setPlayer(winner);
